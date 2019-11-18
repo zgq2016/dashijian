@@ -52,7 +52,7 @@
         <div class="user_center_link">
             <a href="user.html" onclick="setMenu(3,0)" target="main_frame">个人中心</a>
             <img src="images/2.jpg" alt="person">
-            <a href="#"><i class="iconfont icon-tuichu"></i> 退出</a>
+            <a href="#" id="isDel"><i class="iconfont icon-tuichu"></i> 退出</a>
         </div>
     </div>
 
@@ -81,116 +81,24 @@
         </div>
     </div>
 
-
     <script>
-        var $level01 = $('.level01');
-        var $subli = $('.level02 li')
-        $level01.click(function () {
-            $level01.not($(this)).removeClass('active');
-            $(this).addClass('active');
-
-            if ($(this).next().hasClass('level02')) {
-                $(this).next().slideToggle();
-                $(this).find('b').toggleClass('rotate0');
-            } else {
-                $subli.removeClass('active');
-            }
-        })
-
-        $subli.click(function () {
-            $subli.not($(this)).removeClass('active');
-            $(this).addClass('active');
-
-            if (!$(this).parent().prev().hasClass('active')) {
-                $level01.removeClass('active');
-                $(this).parent().prev().addClass('active');
-            }
-        })
-
-        function resizeFrame() {
-            var frame_w = $('#main_body').outerWidth();
-            var frame_h = $('#main_body').outerHeight();
-            $('#main_frame').css({
-                'width': frame_w,
-                'height': frame_h
-            });
-        }
-
-        resizeFrame();
-
-        $(window).resize(function () {
-            resizeFrame();
-        })
-
-
-        function setMenu(m, n) {
-            $level01.eq(m).addClass('active').siblings().not('.level02').removeClass('active');
-            if (m != 1) {
-                $('.level02').slideUp();
-            } else {
-                $('.level02').slideDown();
-                $('.level02').children().eq(n).addClass('active').siblings().removeClass('active');
-            }
-        }
-    </script>
-
-    <script>
-        // 入口函数
         $(function () {
-            //需求: 退出登录
-            //1.给退出按钮(a标签)设置一个点击事件.
-            // $('.icon-tuichu').parent().on('click', function (e) {
-            //     //阻止a标签的默认跳转.
-            //     e.preventDefault();
-            //     if (confirm('确定要退出吗?')) {
-            //         //2.发送ajax请求.
-            //         $.ajax({
-            //             type: 'post',
-            //             url: 'http://localhost:8080/api/v1/admin/user/logout',
-            //             success: function (backData) {
-            //                 if (backData.code == 200) {
-            //                     //3.退出成功后跳转到登录页.
-            //                     window.location.href = './login.html';
-            //                 }
-            //             }
-            //         });
-            //     }
-            // });
-            //1.给退出按钮(a标签)设置一个点击事件.
-            $('.icon-tuichu').parent().on('click', function (e) {
-                //阻止a标签的默认跳转.
-                e.preventDefault();
-                //触发模态框.
-                $('#myModal').modal({
-                    keyboard: true
-                })
-                //给模态框确认按钮注册事件.
-                $('.btn-primary').on('click', function () {
-                    window.localStorage.removeItem('token')
-                    // 删除token 去登录页
-                    window.location.href = './login.html';
-
-                })
-
-            });
-
-
-            //需求: 首页显示登录人信息
-            //1.一进到首页,就发送ajax请求,获取登录人的详细信息
             $.ajax({
+                type: 'get',
                 url: 'http://localhost:8080/api/v1/admin/user/info',
-                success: function (backData) {
-                    if (backData.code == 200) {
-                        console.log(backData);
-                        //2.把对应的信息填入到对应的页面标签中.
-                        $('.user_info>img').attr('src',backData.data.userPic);
-                        $('.user_info>span').html('欢迎&nbsp;&nbsp;'+backData.data.nickname);
-                        $('.user_center_link>img').attr('src',backData.data.userPic);;
-                    }
+                success: function (res) {
+                    console.log(res)
+                    $('.user_info>img').attr('src', res.data.userPic)
+                    $('.user_info>span').html(`欢迎&nbsp;&nbsp;${res.data.nickname}`)
+                    $('.user_center_link>img').attr('src', res.data.userPic)
                 }
-            });
-            //$('body').html("");
-        });
+            })
+            const $isDel = $('#isDel');
+            $isDel.on('click', function () {
+                localStorage.removeItem('token')
+                location.href = './login.html'
+            })
+        })
     </script>
 </body>
 
